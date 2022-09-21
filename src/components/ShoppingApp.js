@@ -8,6 +8,8 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 
 import ShoppingItem from "./ShoppingItem";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/ToolBar";
 
 const boxStyle = {
   display: "flex",
@@ -24,6 +26,15 @@ const boxStyle = {
   border: "1px solid #000",
   boxShadow: 24,
 };
+const ApplicationBar = () => (
+  <Box sx={{ flexGrow: 1 }}>
+    <AppBar color="transparent" position="static">
+      <Toolbar>
+        <h1 style={{ color: "purple" }}> Shopping list app </h1>
+      </Toolbar>
+    </AppBar>
+  </Box>
+);
 class ShoppingApp extends React.Component {
   componentDidMount() {
     const itemsLocal = JSON.parse(localStorage.getItem("items")) || [];
@@ -39,10 +50,17 @@ class ShoppingApp extends React.Component {
     super(props);
 
     // item is a json {text: ""}
-    this.state = { items: [], modalOpen: true };
+    this.state = {
+      items: [],
+      modalOpen: false,
+      editModalOpen: false,
+      idSelected: null,
+    };
 
     this.addItem = this.addItem.bind(this);
     this.openModal = this.openModal.bind(this);
+
+    this.editExistingElement = this.editExistingElement.bind(this);
 
     this.handleModalClose = this.handleModalClose.bind(this);
     this.handleCurrentTextItemChange =
@@ -51,7 +69,7 @@ class ShoppingApp extends React.Component {
 
   addItem() {
     this.setState({ modalOpen: false });
-    this.state.items.push({ text: this.state.currentText });
+    this.state.items.push({ text: this.state.currentText, completed: false });
   }
 
   openModal() {
@@ -65,13 +83,20 @@ class ShoppingApp extends React.Component {
     this.setState({ currentText: event.target.value });
   }
 
+  editExistingElement() {
+    var localItems = this.state.items;
+    localItems[this.state.idSelected].text = this.state.newText;
+
+    this.setState({ items: localItems, editModalOpen: false });
+  }
+
   render() {
     return (
       <div className="container">
-        <h1>"Shopping list" </h1>
+        <ApplicationBar></ApplicationBar>
 
         <Fab
-          color="primary"
+          color="secondary"
           aria-label="add"
           onClick={this.openModal}
           sx={{ position: "absolute", bottom: "20px", right: "20px" }} // override css properties only for the current instance
@@ -84,7 +109,18 @@ class ShoppingApp extends React.Component {
             key={id.toString()}
             index={id}
             text={el.text}
-            editElement={() => 0}
+            completed={el.completed}
+            checkElement={() => {
+              const localItems = this.state.items;
+
+              localItems[id].completed = true;
+              this.setState({ items: localItems });
+            }}
+            editElement={(_) => {
+              this.setState({ currentOldText: el.text });
+              this.setState({ idSelected: id });
+              this.setState({ editModalOpen: true });
+            }}
             removeElement={(_) => {
               const localItems = this.state.items;
               localItems.splice(id, 1);
@@ -98,6 +134,7 @@ class ShoppingApp extends React.Component {
             <h2 style={{ margin: "10pt" }}>Add an item</h2>
 
             <TextField
+              color="secondary"
               id="shopping-item-text"
               label="Shopping item"
               variant="standard"
@@ -106,11 +143,39 @@ class ShoppingApp extends React.Component {
             />
 
             <Button
+              color="secondary"
               variant="contained"
               onClick={this.addItem}
               sx={{ width: "30%", margin: "10pt", alignSelf: "end" }}
             >
               Add
+            </Button>
+          </Box>
+        </Modal>
+
+        <Modal
+          open={this.state.editModalOpen}
+          onClose={this.handleEditModalClose}
+        >
+          <Box sx={boxStyle}>
+            <h2 style={{ margin: "10pt" }}>Add an item</h2>
+
+            <TextField
+              color="secondary"
+              label="Shopping item"
+              defaultValue={this.state.currentOldText}
+              variant="standard"
+              onChange={(evt) => this.setState({ newText: evt.target.value })}
+              sx={{ margin: "10pt", width: "90%" }}
+            />
+
+            <Button
+              color="secondary"
+              variant="contained"
+              onClick={this.editExistingElement}
+              sx={{ width: "30%", margin: "10pt", alignSelf: "end" }}
+            >
+              Edit
             </Button>
           </Box>
         </Modal>

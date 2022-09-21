@@ -4,22 +4,22 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
 import React from "react";
-import Avatar from "@mui/material/Avatar";
 import ListItemText from "@mui/material/ListItemText";
 import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
 
 class ShoppingItem extends React.Component {
   render() {
-    console.log(this.props.text);
     return (
       <ListItem
         key={this.props.index}
         secondaryAction={
           <p>
             <IconButton
+              disabled={this.props.completed}
               edge="end"
               aria-label="edit"
-              onClick={this.props.editElement()}
+              onClick={this.props.editElement}
               sx={{ margin: "0.5pt" }}
             >
               <EditIcon />
@@ -35,11 +35,27 @@ class ShoppingItem extends React.Component {
             </IconButton>
           </p>
         }
+        sx={{
+          backgroundColor: this.props.completed ? "lightgray" : "#F2EEFF",
+          borderLeft: this.props.completed
+            ? "5px solid gray"
+            : "5px solid purple",
+          paddingLeft: "0pt",
+        }}
       >
-        <Avatar>
+        <Button
+          disabled={this.props.completed}
+          color="secondary"
+          onClick={this.props.checkElement}
+        >
           <TaskAltIcon />
-        </Avatar>
-        <ListItemText primary={this.props.text} sx={{ margin: "5pt" }} />
+        </Button>
+        <ListItemText
+          primary={
+            this.props.completed ? <s>{this.props.text}</s> : this.props.text
+          }
+          sx={{ padding: "1px" }}
+        />
       </ListItem>
     );
   }
