@@ -1,12 +1,13 @@
-import ListItem from "@mui/material/ListItem";
-import TaskAltIcon from "@mui/icons-material/TaskAlt";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-
 import React from "react";
+
+import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
+
+import TaskAltIcon from "@mui/icons-material/TaskAlt";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 class ShoppingItem extends React.Component {
   render() {
