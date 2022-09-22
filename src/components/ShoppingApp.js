@@ -16,7 +16,7 @@ import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 const boxStyle = {
   display: "flex",
   flexDirection: "column",
-  width: "fit-content",
+  width: "80%",
   height: "fit-content",
 
   position: "absolute",
@@ -49,6 +49,7 @@ class ShoppingApp extends React.Component {
       editModalOpen: false,
       idSelected: null,
       currentText: "",
+      newText: "",
       onlyCompleted: false,
     };
 
@@ -90,6 +91,7 @@ class ShoppingApp extends React.Component {
   addItem() {
     this.setState({ modalOpen: false });
     this.state.items.push({ text: this.state.currentText, completed: false });
+    this.setState({ currentText: "" });
   }
 
   openModal() {
@@ -97,6 +99,7 @@ class ShoppingApp extends React.Component {
   }
   handleModalClose() {
     this.setState({ modalOpen: false });
+    this.setState({ currentText: "" });
   }
 
   handleCurrentTextItemChange(event) {
@@ -150,7 +153,7 @@ class ShoppingApp extends React.Component {
           ))}
         <Modal open={this.state.modalOpen} onClose={this.handleModalClose}>
           <Box sx={boxStyle}>
-            <h2 style={{ margin: "10pt" }}>Add an item</h2>
+            <h2 style={{ margin: "5%" }}>Add an item</h2>
 
             <TextField
               color="secondary"
@@ -164,6 +167,7 @@ class ShoppingApp extends React.Component {
             <Button
               color="secondary"
               variant="contained"
+              disabled={this.state.currentText.length < 1}
               onClick={this.addItem}
               sx={{ width: "30%", margin: "10pt", alignSelf: "end" }}
             >
@@ -190,6 +194,7 @@ class ShoppingApp extends React.Component {
             <Button
               color="secondary"
               variant="contained"
+              disabled={this.state.newText.length < 1}
               onClick={this.editExistingElement}
               sx={{ width: "30%", margin: "10pt", alignSelf: "end" }}
             >
