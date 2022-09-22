@@ -2,7 +2,7 @@ import React from "react";
 import Fab from "@mui/material/Fab";
 import Modal from "@mui/material/Modal";
 import AddIcon from "@mui/icons-material/Add";
-import "./ShoppingList.css";
+import "./ShoppingApp.css";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -10,6 +10,8 @@ import Button from "@mui/material/Button";
 import ShoppingItem from "./ShoppingItem";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/ToolBar";
+import IconButton from "@mui/material/IconButton";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 
 const boxStyle = {
   display: "flex",
@@ -26,15 +28,6 @@ const boxStyle = {
   border: "1px solid #000",
   boxShadow: 24,
 };
-const ApplicationBar = () => (
-  <Box sx={{ flexGrow: 1 }}>
-    <AppBar color="transparent" position="static">
-      <Toolbar>
-        <h1 style={{ color: "purple" }}> Shopping list app </h1>
-      </Toolbar>
-    </AppBar>
-  </Box>
-);
 class ShoppingApp extends React.Component {
   componentDidMount() {
     const itemsLocal = JSON.parse(localStorage.getItem("items")) || [];
@@ -49,12 +42,14 @@ class ShoppingApp extends React.Component {
   constructor(props) {
     super(props);
 
-    // item is a json {text: ""}
+    //  item in json format {text: string, completed: bool}
     this.state = {
       items: [],
       modalOpen: false,
       editModalOpen: false,
       idSelected: null,
+      currentText: "",
+      onlyCompleted: false,
     };
 
     this.addItem = this.addItem.bind(this);
@@ -65,6 +60,31 @@ class ShoppingApp extends React.Component {
     this.handleModalClose = this.handleModalClose.bind(this);
     this.handleCurrentTextItemChange =
       this.handleCurrentTextItemChange.bind(this);
+    this.filterOnlyCompletedHandler =
+      this.filterOnlyCompletedHandler.bind(this);
+  }
+
+  getApplicationBar() {
+    return (
+      <Box sx={{ flexGrow: 1, marginBottom: "5pt" }}>
+        <AppBar color="secondary" position="static">
+          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+            <h1 style={{ color: "white" }}> Shopping list</h1>
+            <IconButton
+              size="large"
+              color="inherit"
+              onClick={this.filterOnlyCompletedHandler}
+            >
+              <PlaylistAddCheckIcon></PlaylistAddCheckIcon>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+      </Box>
+    );
+  }
+
+  filterOnlyCompletedHandler() {
+    this.setState({ onlyCompleted: !this.state.onlyCompleted });
   }
 
   addItem() {
@@ -93,8 +113,7 @@ class ShoppingApp extends React.Component {
   render() {
     return (
       <div className="container">
-        <ApplicationBar></ApplicationBar>
-
+        {this.getApplicationBar()}
         <Fab
           color="secondary"
           aria-label="add"
@@ -103,32 +122,32 @@ class ShoppingApp extends React.Component {
         >
           <AddIcon> </AddIcon>
         </Fab>
+        {this.state.items
+          .filter((el) => !this.state.onlyCompleted || el.completed)
+          .map((el, id) => (
+            <ShoppingItem
+              key={id.toString()}
+              index={id}
+              text={el.text}
+              completed={el.completed}
+              checkElement={() => {
+                const localItems = this.state.items;
 
-        {this.state.items.map((el, id) => (
-          <ShoppingItem
-            key={id.toString()}
-            index={id}
-            text={el.text}
-            completed={el.completed}
-            checkElement={() => {
-              const localItems = this.state.items;
-
-              localItems[id].completed = true;
-              this.setState({ items: localItems });
-            }}
-            editElement={(_) => {
-              this.setState({ currentOldText: el.text });
-              this.setState({ idSelected: id });
-              this.setState({ editModalOpen: true });
-            }}
-            removeElement={(_) => {
-              const localItems = this.state.items;
-              localItems.splice(id, 1);
-              this.setState({ items: localItems });
-            }}
-          ></ShoppingItem>
-        ))}
-
+                localItems[id].completed = true;
+                this.setState({ items: localItems });
+              }}
+              editElement={(_) => {
+                this.setState({ currentOldText: el.text });
+                this.setState({ idSelected: id });
+                this.setState({ editModalOpen: true });
+              }}
+              removeElement={(_) => {
+                const localItems = this.state.items;
+                localItems.splice(id, 1);
+                this.setState({ items: localItems });
+              }}
+            ></ShoppingItem>
+          ))}
         <Modal open={this.state.modalOpen} onClose={this.handleModalClose}>
           <Box sx={boxStyle}>
             <h2 style={{ margin: "10pt" }}>Add an item</h2>
@@ -152,7 +171,6 @@ class ShoppingApp extends React.Component {
             </Button>
           </Box>
         </Modal>
-
         <Modal
           open={this.state.editModalOpen}
           onClose={this.handleEditModalClose}
